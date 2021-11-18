@@ -27,8 +27,6 @@ public:
     {
         node_ = rclcpp::Node::make_shared("is_marker_in_sight_bt");
 
-        
-
         marker_id = 0;
         if (!getInput<int>("marker_id", marker_id)) {
             // if I can't get this, there is something wrong with your BT.
