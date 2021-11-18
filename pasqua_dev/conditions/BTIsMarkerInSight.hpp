@@ -25,8 +25,18 @@ public:
     IsMarkerInSight(const std::string& name, const BT::NodeConfiguration& config)
         : BT::ConditionNode(name, config)
     {
-        node_ = rclcpp::Node::make_shared("is_marker_in_sight");
-        this->marker_presence_sub = node_->create_subscription<Bool>("/target_tracking/camera_to_marker_presence/marker_69", 1, 
+        node_ = rclcpp::Node::make_shared("is_marker_in_sight_bt");
+
+        
+
+        marker_id = 0;
+        if (!getInput<int>("marker_id", marker_id)) {
+            // if I can't get this, there is something wrong with your BT.
+            // For this reason throw an exception instead of returning FAILURE
+            throw BT::RuntimeError("missing required input [marker_id]");
+        }
+
+        this->marker_presence_sub = node_->create_subscription<Bool>("/target_tracking/camera_to_marker_presence/marker_" + std::to_string(marker_id), 1, 
               std::bind(&IsMarkerInSight::topic_callback, this, std::placeholders::_1));
 
         this->finish_wait = false;
@@ -35,24 +45,22 @@ public:
         exec_.add_node(node_);
         std::thread( [&] {this->exec_.spin();} ).detach();
 
-        RCLCPP_INFO(node_->get_logger(), "IsMarkerInSight - init");
     }
 
     static BT::PortsList providedPorts()
     {
-        return{ BT::InputPort<double>("wait_ms")};
+        return{ BT::InputPort<double>("wait_ms"), BT::InputPort<std::string>("marker_id")};
     }
 
     virtual BT::NodeStatus tick() override
     {
-      
-
         int wait_ms = 0.0;
         if (!getInput<int>("wait_ms", wait_ms)) {
             // if I can't get this, there is something wrong with your BT.
             // For this reason throw an exception instead of returning FAILURE
             throw BT::RuntimeError("missing required input [wait_ms]");
         }
+
 
         if (wait_ms > 0)
         {
@@ -85,6 +93,8 @@ public:
     rclcpp::Subscription<Bool>::SharedPtr marker_presence_sub;
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::executors::SingleThreadedExecutor exec_;
+
+    int marker_id;
 
     bool marker_in_sight;
     bool finish_wait;
