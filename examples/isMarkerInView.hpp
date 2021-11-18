@@ -3,7 +3,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/bool.hpp"
-#include <behaviortree_cpp_v3/action_node.h>
+#include <behaviortree_cpp_v3/condition_node.h>
 
 using namespace std::chrono_literals;
 

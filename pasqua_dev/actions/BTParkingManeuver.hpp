@@ -63,7 +63,7 @@ public:
             
         client_ptr_->async_send_goal(goal_msg, send_goal_options);
 
-        while(not _halt_requested and not this->parking_maneuver_finished){
+        while(not this->parking_maneuver_finished){
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
         
@@ -120,6 +120,8 @@ public:
     void halt() override
     {
         RCLCPP_INFO(node_->get_logger(), "ParkingManeuver - halt requested");
+        parking_maneuver_finished = true;
+        returned_value = false;
         _halt_requested.store(true);
     }
 

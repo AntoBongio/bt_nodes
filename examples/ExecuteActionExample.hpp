@@ -13,39 +13,39 @@
 
 #include "behaviortree_cpp_v3/action_node.h"
 
-#include "controller_interfaces/action/fine_approach.hpp"
+#include "action_tutorials_interfaces/action/fibonacci.hpp"
 
-class FineApproachManeuver : public BT::AsyncActionNode
+class ExecuteActionExample : public BT::AsyncActionNode
 {
 public:
-  using FineApproach = controller_interfaces::action::FineApproach;
-  using GoalHandleFineApproach = rclcpp_action::ClientGoalHandle<FineApproach>;
+  using Fibonacci = action_tutorials_interfaces::action::Fibonacci;
+  using GoalHandleFibonacci = rclcpp_action::ClientGoalHandle<Fibonacci>;
 
-    FineApproachManeuver(const std::string& name, const BT::NodeConfiguration& config)
+    ExecuteActionExample(const std::string& name, const BT::NodeConfiguration& config)
         : BT::AsyncActionNode(name, config)
     {
-        node_ = rclcpp::Node::make_shared("fine_approach_maneuver_bt");
-        this->client_ptr_ = rclcpp_action::create_client<FineApproach>(
+        node_ = rclcpp::Node::make_shared("execute_action_example_bt");
+        this->client_ptr_ = rclcpp_action::create_client<Fibonacci>(
           node_,
-          "/pasqua_controller/fine_approach");
+          "/action_server_name");
 
         while(!client_ptr_->wait_for_action_server()) {
-          RCLCPP_INFO(node_->get_logger(), "Action server fine_approach not available after waiting");
+          RCLCPP_INFO(node_->get_logger(), "Action server not available after waiting");
           std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
         
         exec_.add_node(node_);
         std::thread( [&] {this->exec_.spin();} ).detach();
 
-        send_goal_options = rclcpp_action::Client<FineApproach>::SendGoalOptions();
+        send_goal_options = rclcpp_action::Client<Fibonacci>::SendGoalOptions();
         send_goal_options.goal_response_callback =
-          std::bind(&FineApproachManeuver::goal_response_callback, this, std::placeholders::_1);
+          std::bind(&ExecuteActionExample::goal_response_callback, this, std::placeholders::_1);
         send_goal_options.feedback_callback =
-          std::bind(&FineApproachManeuver::feedback_callback, this, std::placeholders::_1, std::placeholders::_2);
+          std::bind(&ExecuteActionExample::feedback_callback, this, std::placeholders::_1, std::placeholders::_2);
         send_goal_options.result_callback =
-          std::bind(&FineApproachManeuver::result_callback, this, std::placeholders::_1);
+          std::bind(&ExecuteActionExample::result_callback, this, std::placeholders::_1);
           
-        RCLCPP_INFO(node_->get_logger(), "FineApproachManeuver - init");
+        RCLCPP_INFO(node_->get_logger(), "ExecuteActionExample - init");
     }
 
     static BT::PortsList providedPorts()
@@ -55,22 +55,22 @@ public:
 
     virtual BT::NodeStatus tick() override
     {
-        goal_msg = FineApproach::Goal();
+        goal_msg = Fibonacci::Goal();
 
         _halt_requested.store(false);
-        fine_approach_finished = false;
+        action_finished = false;
         
         client_ptr_->async_send_goal(goal_msg, send_goal_options);
 
-        while(not this->fine_approach_finished){
+        while(not this->action_finished){
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
         
-        RCLCPP_INFO(node_->get_logger(), "FineApproachManeuver - FINISHED");
+        RCLCPP_INFO(node_->get_logger(), "ExecuteActionExample - FINISHED");
         return this->returned_value and not _halt_requested ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
     }
 
-    void goal_response_callback(std::shared_future<GoalHandleFineApproach::SharedPtr> future)
+    void goal_response_callback(std::shared_future<GoalHandleFibonacci::SharedPtr> future)
     {
         auto goal_handle = future.get();
         if (!goal_handle) {
@@ -80,13 +80,13 @@ public:
         }
     }
 
-    void feedback_callback(GoalHandleFineApproach::SharedPtr,
-        const std::shared_ptr<const FineApproach::Feedback>)
+    void feedback_callback(GoalHandleFibonacci::SharedPtr,
+        const std::shared_ptr<const Fibonacci::Feedback>)
     {
         
     }
 
-    void result_callback(const GoalHandleFineApproach::WrappedResult & result)
+    void result_callback(const GoalHandleFibonacci::WrappedResult & result)
     {
       if (not _halt_requested)
       {
@@ -95,12 +95,12 @@ public:
             break;
           case rclcpp_action::ResultCode::ABORTED:
             RCLCPP_INFO(node_->get_logger(), "Goal was aborted");
-            fine_approach_finished = true;
+            action_finished = true;
             returned_value = false;
             return;
           case rclcpp_action::ResultCode::CANCELED:
             RCLCPP_INFO(node_->get_logger(), "Goal was canceled");
-            fine_approach_finished = true;
+            action_finished = true;
             returned_value = false;
             return;
           default:
@@ -108,32 +108,32 @@ public:
             return;
         }
         // std::stringstream ss;
-        // ss << "Result received: " << result.result->ret;
+        // ss << "Result received: " << result.result->sequence;
         // RCLCPP_INFO(node_->get_logger(), ss.str().c_str());
         
-        fine_approach_finished = true;
-        returned_value = result.result->ret;
+        action_finished = true;
+        returned_value = true;
       }
     }
 
     // This overloaded method is used to stop the execution of this node.
     void halt() override
     {
-        RCLCPP_INFO(node_->get_logger(), "FineApproachManeuver - halt requested");
-        fine_approach_finished = true;
+        RCLCPP_INFO(node_->get_logger(), "ExecuteActionExample - halt requested");
+        action_finished = true;
         returned_value = false;
         _halt_requested.store(true);
     }
 
   private:
     rclcpp::Node::SharedPtr node_;
-    rclcpp_action::Client<FineApproach>::SharedPtr client_ptr_;
+    rclcpp_action::Client<Fibonacci>::SharedPtr client_ptr_;
     rclcpp::executors::SingleThreadedExecutor exec_;
 
-    rclcpp_action::Client<FineApproachManeuver::FineApproach>::SendGoalOptions send_goal_options;
-    controller_interfaces::action::FineApproach::Goal goal_msg;
+    rclcpp_action::Client<ExecuteActionExample::Fibonacci>::SendGoalOptions send_goal_options;
+    Fibonacci::Goal goal_msg;
 
     std::atomic_bool _halt_requested;
-    bool fine_approach_finished;
+    bool action_finished;
     bool returned_value;
 };
