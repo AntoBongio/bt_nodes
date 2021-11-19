@@ -34,6 +34,14 @@ public:
             throw BT::RuntimeError("missing required input [marker_id]");
         }
 
+        wait_ms = 0.0;
+        if (!getInput<int>("wait_ms", wait_ms)) {
+            // if I can't get this, there is something wrong with your BT.
+            // For this reason throw an exception instead of returning FAILURE
+            throw BT::RuntimeError("missing required input [wait_ms]");
+        }
+        wait_ms_lit = std::chrono::milliseconds(wait_ms);
+
         this->marker_presence_sub = node_->create_subscription<Bool>("/target_tracking/camera_to_marker_presence/marker_" + std::to_string(marker_id), 1, 
               std::bind(&IsMarkerInSight::topic_callback, this, std::placeholders::_1));
 
@@ -52,17 +60,9 @@ public:
 
     virtual BT::NodeStatus tick() override
     {
-        int wait_ms = 0.0;
-        if (!getInput<int>("wait_ms", wait_ms)) {
-            // if I can't get this, there is something wrong with your BT.
-            // For this reason throw an exception instead of returning FAILURE
-            throw BT::RuntimeError("missing required input [wait_ms]");
-        }
-
 
         if (wait_ms > 0)
         {
-            std::chrono::milliseconds wait_ms_lit = std::chrono::milliseconds(wait_ms);
             timer_ = node_->create_wall_timer(wait_ms_lit, std::bind(&IsMarkerInSight::timer_callback, this));
         
             msg_received = false;
@@ -93,6 +93,8 @@ public:
     rclcpp::executors::SingleThreadedExecutor exec_;
 
     int marker_id;
+    int wait_ms;
+    std::chrono::milliseconds wait_ms_lit;
 
     bool marker_in_sight;
     bool finish_wait;

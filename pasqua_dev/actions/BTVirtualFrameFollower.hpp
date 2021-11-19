@@ -16,16 +16,16 @@
 
 #include "controller_interfaces/action/virtual_frame_action.hpp"
 
-class ParkingManeuver : public BT::AsyncActionNode
+class VirtualFrameFollower : public BT::AsyncActionNode
 {
 public:
   using VirtualFrameAction = controller_interfaces::action::VirtualFrameAction;
   using GoalHandleVirtualFrameAction = rclcpp_action::ClientGoalHandle<VirtualFrameAction>;
 
-    ParkingManeuver(const std::string& name, const BT::NodeConfiguration& config)
+    VirtualFrameFollower(const std::string& name, const BT::NodeConfiguration& config)
         : BT::AsyncActionNode(name, config)
     {
-        node_ = rclcpp::Node::make_shared("parking_maneuver_bt");
+        node_ = rclcpp::Node::make_shared("virtual_frame_follower_bt");
         this->client_ptr_ = rclcpp_action::create_client<VirtualFrameAction>(
           node_,
           "/pasqua_controller/virtual_frame_follower");
@@ -40,13 +40,13 @@ public:
 
         send_goal_options = rclcpp_action::Client<VirtualFrameAction>::SendGoalOptions();
         send_goal_options.goal_response_callback =
-          std::bind(&ParkingManeuver::goal_response_callback, this, std::placeholders::_1);
+          std::bind(&VirtualFrameFollower::goal_response_callback, this, std::placeholders::_1);
         send_goal_options.feedback_callback =
-          std::bind(&ParkingManeuver::feedback_callback, this, std::placeholders::_1, std::placeholders::_2);
+          std::bind(&VirtualFrameFollower::feedback_callback, this, std::placeholders::_1, std::placeholders::_2);
         send_goal_options.result_callback =
-          std::bind(&ParkingManeuver::result_callback, this, std::placeholders::_1);
+          std::bind(&VirtualFrameFollower::result_callback, this, std::placeholders::_1);
 
-        RCLCPP_INFO(node_->get_logger(), "ParkingManeuver - init");
+        RCLCPP_INFO(node_->get_logger(), "VirtualFrameFollower - init");
     }
 
     static BT::PortsList providedPorts()
@@ -67,7 +67,7 @@ public:
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
         
-        RCLCPP_INFO(node_->get_logger(), "ParkingManeuver - FINISHED");
+        RCLCPP_INFO(node_->get_logger(), "VirtualFrameFollower - FINISHED");
         return this->returned_value and not _halt_requested ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
     }
 
@@ -119,10 +119,9 @@ public:
     // This overloaded method is used to stop the execution of this node.
     void halt() override
     {
-        RCLCPP_INFO(node_->get_logger(), "ParkingManeuver - halt requested");
+        RCLCPP_INFO(node_->get_logger(), "VirtualFrameFollower - halt requested");
         parking_maneuver_finished = true;
         returned_value = false;
-        _halt_requested.store(true);
     }
 
   private:
@@ -131,7 +130,7 @@ public:
     rclcpp_action::Client<VirtualFrameAction>::SharedPtr client_ptr_;
     rclcpp::executors::SingleThreadedExecutor exec_;
 
-    rclcpp_action::Client<ParkingManeuver::VirtualFrameAction>::SendGoalOptions send_goal_options;
+    rclcpp_action::Client<VirtualFrameFollower::VirtualFrameAction>::SendGoalOptions send_goal_options;
 
     std::atomic_bool _halt_requested;
     bool parking_maneuver_finished;

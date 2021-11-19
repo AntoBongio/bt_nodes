@@ -32,6 +32,14 @@ public:
         this->finish_wait = false;
         parking_path_computed = false;
         this->parking_status = -100;
+        
+        wait_ms = 0.0;
+        if (!getInput<int>("wait_ms", wait_ms)) {
+            // if I can't get this, there is something wrong with your BT.
+            // For this reason throw an exception instead of returning FAILURE
+            throw BT::RuntimeError("missing required input [wait_ms]");
+        }
+        wait_ms_lit = std::chrono::milliseconds(wait_ms);
 
         exec_.add_node(node_);
         std::thread( [&] {this->exec_.spin();} ).detach();
@@ -92,6 +100,9 @@ public:
     rclcpp::Subscription<ParkingStatus>::SharedPtr parking_status_sub;
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::executors::SingleThreadedExecutor exec_;
+
+    int wait_ms;
+    std::chrono::milliseconds wait_ms_lit;
 
     int parking_status;
     bool finish_wait;

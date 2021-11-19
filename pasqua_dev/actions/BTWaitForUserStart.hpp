@@ -29,7 +29,7 @@ public:
         node_ = rclcpp::Node::make_shared("wait_for_user_start_bt");
 
         wait_user_start = node_->create_service<SetBool>("/behaviour_tree/start",
-         std::bind(&WaitForUserStart::callback_start, this, std::placeholders::_1, std::placeholders::_2)); 
+            std::bind(&WaitForUserStart::callback_start, this, std::placeholders::_1, std::placeholders::_2)); 
 
         this->service_called = false;
         this->user_start = false;

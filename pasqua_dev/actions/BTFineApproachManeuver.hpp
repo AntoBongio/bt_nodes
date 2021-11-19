@@ -122,7 +122,6 @@ public:
         RCLCPP_INFO(node_->get_logger(), "FineApproachManeuver - halt requested");
         fine_approach_finished = true;
         returned_value = false;
-        _halt_requested.store(true);
     }
 
   private:
