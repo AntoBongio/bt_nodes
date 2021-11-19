@@ -15,19 +15,19 @@
 
 #include "marker_snooping_interfaces/action/snooping.hpp"
 
-class SnoopMarker : public BT::SyncActionNode
+class SnoopForTarget : public BT::SyncActionNode
 {
 public:
   using Snooping = marker_snooping_interfaces::action::Snooping;
   using GoalHandleSnooping = rclcpp_action::ClientGoalHandle<Snooping>;
 
-    SnoopMarker(const std::string& name, const BT::NodeConfiguration& config)
+    SnoopForTarget(const std::string& name, const BT::NodeConfiguration& config, std::string marker_snooping_action_server_name)
         : BT::SyncActionNode(name, config)
     {
         node_ = rclcpp::Node::make_shared("snoop_bt");
         this->client_ptr_ = rclcpp_action::create_client<Snooping>(
           node_,
-          "/marker_snooping/start_action");
+          marker_snooping_action_server_name);
 
         while(!client_ptr_->wait_for_action_server()) {
           RCLCPP_INFO(node_->get_logger(), "Action server snoop not available after waiting");
@@ -36,13 +36,13 @@ public:
 
         send_goal_options = rclcpp_action::Client<Snooping>::SendGoalOptions();
         send_goal_options.goal_response_callback =
-          std::bind(&SnoopMarker::goal_response_callback, this, std::placeholders::_1);
+          std::bind(&SnoopForTarget::goal_response_callback, this, std::placeholders::_1);
         send_goal_options.feedback_callback =
-          std::bind(&SnoopMarker::feedback_callback, this, std::placeholders::_1, std::placeholders::_2);
+          std::bind(&SnoopForTarget::feedback_callback, this, std::placeholders::_1, std::placeholders::_2);
         send_goal_options.result_callback =
-          std::bind(&SnoopMarker::result_callback, this, std::placeholders::_1);
+          std::bind(&SnoopForTarget::result_callback, this, std::placeholders::_1);
         
-        RCLCPP_INFO(node_->get_logger(), "SnoopMarker - init");
+        RCLCPP_INFO(node_->get_logger(), "SnoopForTarget - init");
     }
 
     static BT::PortsList providedPorts()
@@ -60,7 +60,7 @@ public:
             rclcpp::spin_some(node_);
         }
         
-        RCLCPP_INFO(node_->get_logger(), "SnoopMarker - FINISHED");
+        RCLCPP_INFO(node_->get_logger(), "SnoopForTarget - FINISHED");
         return this->returned_value ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
     }
 
@@ -112,7 +112,7 @@ public:
     rclcpp::Node::SharedPtr node_;
     rclcpp_action::Client<Snooping>::SharedPtr client_ptr_;
 
-    rclcpp_action::Client<SnoopMarker::Snooping>::SendGoalOptions send_goal_options;
+    rclcpp_action::Client<SnoopForTarget::Snooping>::SendGoalOptions send_goal_options;
     marker_snooping_interfaces::action::Snooping::Goal goal_msg;
 
     bool snooping_finished;

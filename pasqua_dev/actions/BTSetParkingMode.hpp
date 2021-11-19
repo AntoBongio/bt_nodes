@@ -22,12 +22,13 @@ class SetParkingMode : public BT::SyncActionNode
 public:
   using SetBool = std_srvs::srv::SetBool;
 
-    SetParkingMode(const std::string& name, const BT::NodeConfiguration& config)
+    SetParkingMode(const std::string& name, const BT::NodeConfiguration& config, std::string set_parking_mode_service_name)
         : BT::SyncActionNode(name, config)
     {
         node_ = rclcpp::Node::make_shared("set_parking_mode_bt");
         this->client_ptr_ = node_->create_client<SetBool>(
-          "/pasqua_controller/set_parking_mode");
+          set_parking_mode_service_name
+          );
 
         while(!client_ptr_->wait_for_service(1s)) {
           RCLCPP_INFO(node_->get_logger(), "Client set_parking_mode not available - waiting");

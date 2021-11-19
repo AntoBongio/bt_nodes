@@ -22,11 +22,11 @@ class IsFineApproachFinished : public BT::ConditionNode
 public:
   using ParkingStatus = parking_interfaces::msg::ParkingStatus;
 
-    IsFineApproachFinished(const std::string& name, const BT::NodeConfiguration& config)
+    IsFineApproachFinished(const std::string& name, const BT::NodeConfiguration& config, std::string parking_status_topic)
         : BT::ConditionNode(name, config)
     {
         node_ = rclcpp::Node::make_shared("is_fine_approach_finished_bt");
-        this->parking_status_sub = node_->create_subscription<ParkingStatus>("/parking/status", 1, 
+        this->parking_status_sub = node_->create_subscription<ParkingStatus>(parking_status_topic, 1, 
               std::bind(&IsFineApproachFinished::topic_callback, this, std::placeholders::_1));
 
         this->finish_wait = false;
@@ -41,33 +41,17 @@ public:
 
     static BT::PortsList providedPorts()
     {
-        return{ BT::InputPort<double>("wait_ms")};
+        return{};
     }
 
     virtual BT::NodeStatus tick() override
     {
-        if (wait_ms > 0)
-        {
-          timer_ = node_->create_wall_timer(wait_ms_lit, std::bind(&IsFineApproachFinished::timer_callback, this));
-        
-          msg_received = false;
-          while(not this->finish_wait and not msg_received){
-              std::this_thread::sleep_for(std::chrono::milliseconds(10));
-          }
-        }
-
         if(parking_status == 0)
           parking_finished = true;
         else
           parking_finished = false;
 
         return this->parking_finished ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
-    }
-
-    void timer_callback()
-    {
-      this->finish_wait = true;
-      this->timer_->cancel();
     }
 
     void topic_callback(const ParkingStatus::ConstSharedPtr msg)
@@ -80,11 +64,7 @@ public:
   private:
     rclcpp::Node::SharedPtr node_;
     rclcpp::Subscription<ParkingStatus>::SharedPtr parking_status_sub;
-    rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::executors::SingleThreadedExecutor exec_;
-
-    int wait_ms;
-    std::chrono::milliseconds wait_ms_lit;
 
     int parking_status;
     bool finish_wait;

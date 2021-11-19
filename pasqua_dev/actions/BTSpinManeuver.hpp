@@ -19,16 +19,16 @@
 class SpinManeuver : public BT::AsyncActionNode
 {
 public:
-  using Spin = controller_interfaces::action::Spin;
-  using GoalHandleSpin = rclcpp_action::ClientGoalHandle<Spin>;
+    using Spin = controller_interfaces::action::Spin;
+    using GoalHandleSpin = rclcpp_action::ClientGoalHandle<Spin>;
 
-    SpinManeuver(const std::string& name, const BT::NodeConfiguration& config)
+    SpinManeuver(const std::string& name, const BT::NodeConfiguration& config, std::string spin_action_server_name)
         : BT::AsyncActionNode(name, config)
     {
         node_ = rclcpp::Node::make_shared("spin_maneuver_bt");
         this->client_ptr_ = rclcpp_action::create_client<Spin>(
           node_,
-          "/pasqua_controller/spin");
+          spin_action_server_name);
 
         while(!client_ptr_->wait_for_action_server()) {
           RCLCPP_INFO(node_->get_logger(), "Action server spin not available after waiting");

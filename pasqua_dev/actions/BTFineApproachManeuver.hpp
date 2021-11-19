@@ -21,13 +21,13 @@ public:
   using FineApproach = controller_interfaces::action::FineApproach;
   using GoalHandleFineApproach = rclcpp_action::ClientGoalHandle<FineApproach>;
 
-    FineApproachManeuver(const std::string& name, const BT::NodeConfiguration& config)
+    FineApproachManeuver(const std::string& name, const BT::NodeConfiguration& config, std::string fine_approach_action_server_name)
         : BT::AsyncActionNode(name, config)
     {
         node_ = rclcpp::Node::make_shared("fine_approach_maneuver_bt");
         this->client_ptr_ = rclcpp_action::create_client<FineApproach>(
-          node_,
-          "/pasqua_controller/fine_approach");
+          node_, fine_approach_action_server_name
+          );
 
         while(!client_ptr_->wait_for_action_server()) {
           RCLCPP_INFO(node_->get_logger(), "Action server fine_approach not available after waiting");

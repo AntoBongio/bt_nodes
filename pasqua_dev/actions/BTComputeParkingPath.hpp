@@ -22,12 +22,12 @@ class ComputeParkingPath : public BT::SyncActionNode
 public:
   using Trigger = std_srvs::srv::Trigger;
 
-    ComputeParkingPath(const std::string& name, const BT::NodeConfiguration& config)
+    ComputeParkingPath(const std::string& name, const BT::NodeConfiguration& config, std::string compute_parking_path_service_name)
         : BT::SyncActionNode(name, config)
     {
         node_ = rclcpp::Node::make_shared("compute_parking_path_bt");
         this->client_ptr_ = node_->create_client<Trigger>(
-          "/parking/compute_parking_path");
+          compute_parking_path_service_name);
 
         while(!client_ptr_->wait_for_service(1s)) {
           RCLCPP_INFO(node_->get_logger(), "Client compute_parking_path not available - waiting");

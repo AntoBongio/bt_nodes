@@ -19,16 +19,16 @@
 class VirtualFrameFollower : public BT::AsyncActionNode
 {
 public:
-  using VirtualFrameAction = controller_interfaces::action::VirtualFrameAction;
-  using GoalHandleVirtualFrameAction = rclcpp_action::ClientGoalHandle<VirtualFrameAction>;
+    using VirtualFrameAction = controller_interfaces::action::VirtualFrameAction;
+    using GoalHandleVirtualFrameAction = rclcpp_action::ClientGoalHandle<VirtualFrameAction>;
 
-    VirtualFrameFollower(const std::string& name, const BT::NodeConfiguration& config)
+    VirtualFrameFollower(const std::string& name, const BT::NodeConfiguration& config, std::string virtual_frame_follower_action_server_name)
         : BT::AsyncActionNode(name, config)
     {
         node_ = rclcpp::Node::make_shared("virtual_frame_follower_bt");
         this->client_ptr_ = rclcpp_action::create_client<VirtualFrameAction>(
           node_,
-          "/pasqua_controller/virtual_frame_follower");
+          virtual_frame_follower_action_server_name);
 
         while(!client_ptr_->wait_for_action_server()) {
           RCLCPP_INFO(node_->get_logger(), "Action server virtual frame follower not available after waiting");
