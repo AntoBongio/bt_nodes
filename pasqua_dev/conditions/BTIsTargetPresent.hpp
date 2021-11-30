@@ -22,11 +22,12 @@ class IsTargetPresent : public BT::ConditionNode
 public:
   using Bool = std_msgs::msg::Bool;
 
-    IsTargetPresent(const std::string& name, const BT::NodeConfiguration& config, std::string target_presence_topic)
+    IsTargetPresent(const std::string& name, const BT::NodeConfiguration& config,  
+          std::string ns, std::string target_presence_topic)
         : BT::ConditionNode(name, config)
     {
       
-        node_ = rclcpp::Node::make_shared("is_target_present_bt");
+        node_ = rclcpp::Node::make_shared("is_target_present_bt", ns);
 
         target_type_ = "";
         if (!getInput<std::string>("target_type", target_type_)) {

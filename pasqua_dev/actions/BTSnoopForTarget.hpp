@@ -21,10 +21,11 @@ public:
   using Snooping = marker_snooping_interfaces::action::Snooping;
   using GoalHandleSnooping = rclcpp_action::ClientGoalHandle<Snooping>;
 
-    SnoopForTarget(const std::string& name, const BT::NodeConfiguration& config, std::string marker_snooping_action_server_name)
+    SnoopForTarget(const std::string& name, const BT::NodeConfiguration& config,  
+          std::string ns, std::string marker_snooping_action_server_name)
         : BT::SyncActionNode(name, config)
     {
-        node_ = rclcpp::Node::make_shared("snoop_bt");
+        node_ = rclcpp::Node::make_shared("snoop_bt", ns);
         this->client_ptr_ = rclcpp_action::create_client<Snooping>(
           node_,
           marker_snooping_action_server_name);

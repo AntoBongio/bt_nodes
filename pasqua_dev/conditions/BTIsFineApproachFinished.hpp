@@ -22,10 +22,11 @@ class IsFineApproachFinished : public BT::ConditionNode
 public:
   using ParkingStatus = parking_interfaces::msg::ParkingStatus;
 
-    IsFineApproachFinished(const std::string& name, const BT::NodeConfiguration& config, std::string parking_status_topic)
+    IsFineApproachFinished(const std::string& name, const BT::NodeConfiguration& config,  
+          std::string ns, std::string parking_status_topic)
         : BT::ConditionNode(name, config)
     {
-        node_ = rclcpp::Node::make_shared("is_fine_approach_finished_bt");
+        node_ = rclcpp::Node::make_shared("is_fine_approach_finished_bt", ns);
         this->parking_status_sub = node_->create_subscription<ParkingStatus>(parking_status_topic, 1, 
               std::bind(&IsFineApproachFinished::topic_callback, this, std::placeholders::_1));
 

@@ -22,10 +22,11 @@ class SetParkingMode : public BT::SyncActionNode
 public:
   using SetBool = std_srvs::srv::SetBool;
 
-    SetParkingMode(const std::string& name, const BT::NodeConfiguration& config, std::string set_parking_mode_service_name)
+    SetParkingMode(const std::string& name, const BT::NodeConfiguration& config,  
+          std::string ns, std::string set_parking_mode_service_name)
         : BT::SyncActionNode(name, config)
     {
-        node_ = rclcpp::Node::make_shared("set_parking_mode_bt");
+        node_ = rclcpp::Node::make_shared("set_parking_mode_bt", ns);
         this->client_ptr_ = node_->create_client<SetBool>(
           set_parking_mode_service_name
           );

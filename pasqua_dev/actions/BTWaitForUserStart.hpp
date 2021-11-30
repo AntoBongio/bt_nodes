@@ -23,10 +23,11 @@ class WaitForUserStart : public BT::AsyncActionNode
 public:
     using SetBool = std_srvs::srv::SetBool;
 
-    WaitForUserStart(const std::string& name, const BT::NodeConfiguration& config, std::string wait_for_user_server_service_name)
+    WaitForUserStart(const std::string& name, const BT::NodeConfiguration& config,  
+          std::string ns, std::string wait_for_user_server_service_name)
         : BT::AsyncActionNode(name, config)
     {
-        node_ = rclcpp::Node::make_shared("wait_for_user_start_bt");
+        node_ = rclcpp::Node::make_shared("wait_for_user_start_bt", ns);
 
         wait_user_start = node_->create_service<SetBool>(wait_for_user_server_service_name,
             std::bind(&WaitForUserStart::callback_start, this, std::placeholders::_1, std::placeholders::_2)); 
