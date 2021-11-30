@@ -23,10 +23,11 @@ class SetTiltSnooping : public BT::SyncActionNode
 public:
   using SetTiltStatic = marker_snooping_interfaces::srv::SetTiltStatic;
 
-    SetTiltSnooping(const std::string& name, const BT::NodeConfiguration& config, std::string set_tilt_snooping_service_name)
+    SetTiltSnooping(const std::string& name, const BT::NodeConfiguration& config,  
+          std::string ns, std::string set_tilt_snooping_service_name)
         : BT::SyncActionNode(name, config)
     {
-        node_ = rclcpp::Node::make_shared("set_tilt_static_snoop_bt");
+        node_ = rclcpp::Node::make_shared("set_tilt_static_snoop_bt", ns);
         this->client_ptr_ = node_->create_client<SetTiltStatic>(
           set_tilt_snooping_service_name);
 

@@ -21,10 +21,11 @@ public:
   using FineApproach = controller_interfaces::action::FineApproach;
   using GoalHandleFineApproach = rclcpp_action::ClientGoalHandle<FineApproach>;
 
-    FineApproachManeuver(const std::string& name, const BT::NodeConfiguration& config, std::string fine_approach_action_server_name)
+    FineApproachManeuver(const std::string& name, const BT::NodeConfiguration& config,  
+          std::string ns, std::string fine_approach_action_server_name)
         : BT::AsyncActionNode(name, config)
     {
-        node_ = rclcpp::Node::make_shared("fine_approach_maneuver_bt");
+        node_ = rclcpp::Node::make_shared("fine_approach_maneuver_bt", ns);
         this->client_ptr_ = rclcpp_action::create_client<FineApproach>(
           node_, fine_approach_action_server_name
           );

@@ -22,10 +22,11 @@ public:
     using VirtualFrameAction = controller_interfaces::action::VirtualFrameAction;
     using GoalHandleVirtualFrameAction = rclcpp_action::ClientGoalHandle<VirtualFrameAction>;
 
-    VirtualFrameFollower(const std::string& name, const BT::NodeConfiguration& config, std::string virtual_frame_follower_action_server_name)
+    VirtualFrameFollower(const std::string& name, const BT::NodeConfiguration& config,  
+          std::string ns, std::string virtual_frame_follower_action_server_name)
         : BT::AsyncActionNode(name, config)
     {
-        node_ = rclcpp::Node::make_shared("virtual_frame_follower_bt");
+        node_ = rclcpp::Node::make_shared("virtual_frame_follower_bt", ns);
         this->client_ptr_ = rclcpp_action::create_client<VirtualFrameAction>(
           node_,
           virtual_frame_follower_action_server_name);

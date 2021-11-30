@@ -22,10 +22,11 @@ class IsParkingPathComputed : public BT::ConditionNode
 public:
   using ParkingStatus = parking_interfaces::msg::ParkingStatus;
 
-    IsParkingPathComputed(const std::string& name, const BT::NodeConfiguration& config, std::string parking_status_topic)
+    IsParkingPathComputed(const std::string& name, const BT::NodeConfiguration& config,  
+          std::string ns, std::string parking_status_topic)
         : BT::ConditionNode(name, config)
     {
-        node_ = rclcpp::Node::make_shared("is_parking_path_computed_bt");
+        node_ = rclcpp::Node::make_shared("is_parking_path_computed_bt", ns);
         this->parking_status_sub = node_->create_subscription<ParkingStatus>(parking_status_topic, 1, 
               std::bind(&IsParkingPathComputed::topic_callback, this, std::placeholders::_1));
 

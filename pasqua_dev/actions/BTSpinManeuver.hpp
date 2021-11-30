@@ -22,10 +22,11 @@ public:
     using Spin = controller_interfaces::action::Spin;
     using GoalHandleSpin = rclcpp_action::ClientGoalHandle<Spin>;
 
-    SpinManeuver(const std::string& name, const BT::NodeConfiguration& config, std::string spin_action_server_name)
+    SpinManeuver(const std::string& name, const BT::NodeConfiguration& config,  
+          std::string ns, std::string spin_action_server_name)
         : BT::AsyncActionNode(name, config)
     {
-        node_ = rclcpp::Node::make_shared("spin_maneuver_bt");
+        node_ = rclcpp::Node::make_shared("spin_maneuver_bt", ns);
         this->client_ptr_ = rclcpp_action::create_client<Spin>(
           node_,
           spin_action_server_name);

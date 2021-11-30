@@ -22,10 +22,11 @@ class StartSearchingParkingSpot : public BT::SyncActionNode
 public:
   using Empty = std_srvs::srv::Empty;
 
-    StartSearchingParkingSpot(const std::string& name, const BT::NodeConfiguration& config, std::string search_parking_spot_service_name)
+    StartSearchingParkingSpot(const std::string& name, const BT::NodeConfiguration& config,  
+          std::string ns, std::string search_parking_spot_service_name)
         : BT::SyncActionNode(name, config)
     {
-        node_ = rclcpp::Node::make_shared("look_for_marker_bt");
+        node_ = rclcpp::Node::make_shared("look_for_marker_bt", ns);
         this->client_ptr_ = node_->create_client<Empty>(
           search_parking_spot_service_name);
 
