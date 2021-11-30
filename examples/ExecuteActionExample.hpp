@@ -29,6 +29,7 @@ public:
           node_,
           "/action_server_name");
 
+
         while(!client_ptr_->wait_for_action_server()) {
           RCLCPP_INFO(node_->get_logger(), "Action server not available after waiting");
           std::this_thread::sleep_for(std::chrono::milliseconds(100));
