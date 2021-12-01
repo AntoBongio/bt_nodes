@@ -19,21 +19,21 @@
 #include "behaviortree_cpp_v3/action_node.h"
 #include <chrono>
 #include <thread>
-#include "std_srvs/srv/trigger.hpp"
+#include "std_srvs/srv/set_bool.hpp"
 
 using namespace std::chrono_literals;
 
 class StartNN : public BT::SyncActionNode
 {
 public:
-  using Trigger = std_srvs::srv::Trigger;
+  using SetBool = std_srvs::srv::SetBool;
 
     StartNN(const std::string& name, const BT::NodeConfiguration& config,
                 std::string ns, std::string start_nn_service_name)
         : BT::SyncActionNode(name, config)
     {
         node_ = rclcpp::Node::make_shared("start_nn_bt", ns);
-        this->client_ptr_ = node_->create_client<Trigger>(
+        this->client_ptr_ = node_->create_client<SetBool>(
           start_nn_service_name);
 
         while(!client_ptr_->wait_for_service(1s)) {
@@ -54,10 +54,11 @@ public:
         nn_started = false;
         returned_value = false;
 
-        auto request = std::make_shared<Trigger::Request>();
+        auto request = std::make_shared<SetBool::Request>();
+        request->data = true;
 
         using ServiceResponseFuture =
-          rclcpp::Client<Trigger>::SharedFutureWithRequest;
+          rclcpp::Client<SetBool>::SharedFutureWithRequest;
         auto response_received_callback =
           [&](ServiceResponseFuture future) {
             auto request_response_pair = future.get();
@@ -78,7 +79,7 @@ public:
 
   private:
     rclcpp::Node::SharedPtr node_;
-    rclcpp::Client<Trigger>::SharedPtr  client_ptr_;
+    rclcpp::Client<SetBool>::SharedPtr  client_ptr_;
 
     bool nn_started;
     bool returned_value;
