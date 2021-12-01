@@ -17,25 +17,25 @@
 
 using namespace std::chrono_literals;
 
-class StartSearchingParkingSpot : public BT::SyncActionNode
+class StartSearchForTarget : public BT::SyncActionNode
 {
 public:
   using Empty = std_srvs::srv::Empty;
 
-    StartSearchingParkingSpot(const std::string& name, const BT::NodeConfiguration& config,  
-          std::string ns, std::string search_parking_spot_service_name)
+    StartSearchForTarget(const std::string& name, const BT::NodeConfiguration& config,  
+          std::string ns, std::string search_target_service_name)
         : BT::SyncActionNode(name, config)
     {
-        node_ = rclcpp::Node::make_shared("look_for_marker_bt", ns);
+        node_ = rclcpp::Node::make_shared("look_for_target_bt", ns);
         this->client_ptr_ = node_->create_client<Empty>(
-          search_parking_spot_service_name);
+          search_target_service_name);
 
         while(!client_ptr_->wait_for_service(1s)) {
           RCLCPP_INFO(node_->get_logger(), "Client start_searching not available - waiting");
           std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
-        RCLCPP_INFO(node_->get_logger(), "StartSearchingParkingSpot - init");
+        RCLCPP_INFO(node_->get_logger(), "StartSearchForTarget - init");
     }
 
     static BT::PortsList providedPorts()
