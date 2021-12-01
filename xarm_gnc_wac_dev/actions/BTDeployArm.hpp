@@ -37,7 +37,7 @@ public:
           deploy_arm_service_name);
 
         // while(!client_ptr_->wait_for_service(1s)) {
-        //   RCLCPP_INFO(node_->get_logger(), "Client compute_parking_path not available - waiting");
+        //   RCLCPP_INFO(node_->get_logger(), "Client deploy_arm not available - waiting");
         //   std::this_thread::sleep_for(std::chrono::milliseconds(100));
         // }
 

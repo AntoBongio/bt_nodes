@@ -33,11 +33,13 @@ public:
         : BT::SyncActionNode(name, config)
     {
         node_ = rclcpp::Node::make_shared("start_nn_bt", ns);
+
+        RCLCPP_INFO(node_->get_logger(), start_nn_service_name);
         this->client_ptr_ = node_->create_client<SetBool>(
           start_nn_service_name);
 
         while(!client_ptr_->wait_for_service(1s)) {
-          RCLCPP_INFO(node_->get_logger(), "Client compute_parking_path not available - waiting");
+          RCLCPP_INFO(node_->get_logger(), "Client start_nn not available - waiting");
           std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
