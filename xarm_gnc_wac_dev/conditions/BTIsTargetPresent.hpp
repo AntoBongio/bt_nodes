@@ -49,7 +49,7 @@ public:
               std::bind(&IsTargetPresent::topic_callback, this, std::placeholders::_1));
 
         }
-        else if(target_str_ == "nn_detection") {
+        else if(target_str_ == "nn") {
           this->target_presence_sub_ = node_->create_subscription<Bool>(target_presence_topic, 1, 
               std::bind(&IsTargetPresent::topic_callback, this, std::placeholders::_1));
 
