@@ -26,7 +26,7 @@ public:
         : BT::ConditionNode(name, config)
     {
         node_ = rclcpp::Node::make_shared("read_topic_message_example_bt");
-        this->marker_presence_sub = node_->create_subscription<Bool>("/topic_name", 1, 
+        this->sub_ = node_->create_subscription<Bool>("/topic_name", 1, 
               std::bind(&ReadTopicMessageExample::topic_callback, this, std::placeholders::_1));
 
         this->finish_waiting = false;
@@ -89,7 +89,7 @@ public:
 
   private:
     rclcpp::Node::SharedPtr node_;
-    rclcpp::Subscription<Bool>::SharedPtr marker_presence_sub;
+    rclcpp::Subscription<Bool>::SharedPtr sub_;
 
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::executors::SingleThreadedExecutor exec_;

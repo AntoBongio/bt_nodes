@@ -64,7 +64,7 @@ public:
             rclcpp::spin_some(node_);
         }
       
-        RCLCPP_INFO(node_->get_logger(), "MarkerLocInit - FINISHED");
+        RCLCPP_INFO(node_->get_logger(), "LocInitZero - FINISHED");
         return _halt_requested or not this->returned_value ? BT::NodeStatus::FAILURE : BT::NodeStatus::SUCCESS;
     }
 

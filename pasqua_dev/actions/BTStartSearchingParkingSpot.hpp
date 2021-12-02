@@ -26,7 +26,7 @@ public:
           std::string ns, std::string search_parking_spot_service_name)
         : BT::SyncActionNode(name, config)
     {
-        node_ = rclcpp::Node::make_shared("look_for_marker_bt", ns);
+        node_ = rclcpp::Node::make_shared("search_parking_spot_bt", ns);
         this->client_ptr_ = node_->create_client<Empty>(
           search_parking_spot_service_name);
 
