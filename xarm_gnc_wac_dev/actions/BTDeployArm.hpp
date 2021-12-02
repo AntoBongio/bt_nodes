@@ -54,22 +54,22 @@ public:
         arm_deployed = false;
         returned_value = false;
 
-        // auto request = std::make_shared<Trigger::Request>();
+        auto request = std::make_shared<Trigger::Request>();
 
-        // using ServiceResponseFuture =
-        //   rclcpp::Client<Trigger>::SharedFutureWithRequest;
-        // auto response_received_callback =
-        //   [&](ServiceResponseFuture future) {
-        //     auto request_response_pair = future.get();
-        //     this->arm_deployed = true;
-        //     this->returned_value = request_response_pair.second->success;
-        //   };
+        using ServiceResponseFuture =
+          rclcpp::Client<Trigger>::SharedFutureWithRequest;
+        auto response_received_callback =
+          [&](ServiceResponseFuture future) {
+            auto request_response_pair = future.get();
+            this->arm_deployed = true;
+            this->returned_value = request_response_pair.second->success;
+          };
 
-        // auto result = client_ptr_->async_send_request(request, std::move(response_received_callback));
+        auto result = client_ptr_->async_send_request(request, std::move(response_received_callback));
 
-        // while(!this->arm_deployed){
-        //     rclcpp::spin_some(node_);
-        // }
+        while(!this->arm_deployed){
+            rclcpp::spin_some(node_);
+        }
         returned_value = true;
         
         return this->returned_value ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;

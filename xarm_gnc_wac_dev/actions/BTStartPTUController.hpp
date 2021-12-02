@@ -36,10 +36,10 @@ public:
         this->client_ptr_ = node_->create_client<SetBool>(
           start_ptu_control_service_name);
 
-        // while(!client_ptr_->wait_for_service(1s)) {
-        //   RCLCPP_INFO(node_->get_logger(), "Client start_ptu_controller not available - waiting");
-        //   std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        // }
+        while(!client_ptr_->wait_for_service(1s)) {
+          RCLCPP_INFO(node_->get_logger(), "Client start_ptu_controller not available - waiting");
+          std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
 
         RCLCPP_INFO(node_->get_logger(), "StartPTUController - init");
     }
@@ -54,23 +54,23 @@ public:
         ptu_control_mode_set = false;
         returned_value = false;
 
-        // auto request = std::make_shared<SetBool::Request>();
-        // request->data = True;
+        auto request = std::make_shared<SetBool::Request>();
+        request->data = True;
 
-        // using ServiceResponseFuture =
-        //   rclcpp::Client<SetBool>::SharedFutureWithRequest;
-        // auto response_received_callback =
-        //   [&](ServiceResponseFuture future) {
-        //     auto request_response_pair = future.get();
-        //     this->ptu_control_mode_set = true;
-        //     this->returned_value = request_response_pair.second->success;
-        //   };
+        using ServiceResponseFuture =
+          rclcpp::Client<SetBool>::SharedFutureWithRequest;
+        auto response_received_callback =
+          [&](ServiceResponseFuture future) {
+            auto request_response_pair = future.get();
+            this->ptu_control_mode_set = true;
+            this->returned_value = request_response_pair.second->success;
+          };
 
-        // auto result = client_ptr_->async_send_request(request, std::move(response_received_callback));
+        auto result = client_ptr_->async_send_request(request, std::move(response_received_callback));
 
-        // while(!this->ptu_control_mode_set){
-        //     rclcpp::spin_some(node_);
-        // }
+        while(!this->ptu_control_mode_set){
+            rclcpp::spin_some(node_);
+        }
 
         returned_value = true;
         
