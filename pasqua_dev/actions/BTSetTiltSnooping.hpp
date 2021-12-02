@@ -14,14 +14,14 @@
 
 #include "behaviortree_cpp_v3/action_node.h"
 
-#include "marker_snooping_interfaces/srv/set_tilt_static.hpp"
+#include "target_snooping_interfaces/srv/set_tilt_static.hpp"
 
 using namespace std::chrono_literals;
 
 class SetTiltSnooping : public BT::SyncActionNode
 {
 public:
-  using SetTiltStatic = marker_snooping_interfaces::srv::SetTiltStatic;
+  using SetTiltStatic = target_snooping_interfaces::srv::SetTiltStatic;
 
     SetTiltSnooping(const std::string& name, const BT::NodeConfiguration& config,  
           std::string ns, std::string set_tilt_snooping_service_name)

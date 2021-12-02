@@ -13,22 +13,22 @@
 
 #include "behaviortree_cpp_v3/action_node.h"
 
-#include "marker_snooping_interfaces/action/snooping.hpp"
+#include "target_snooping_interfaces/action/snooping.hpp"
 
 class SnoopForTarget : public BT::SyncActionNode
 {
 public:
-  using Snooping = marker_snooping_interfaces::action::Snooping;
+  using Snooping = target_snooping_interfaces::action::Snooping;
   using GoalHandleSnooping = rclcpp_action::ClientGoalHandle<Snooping>;
 
     SnoopForTarget(const std::string& name, const BT::NodeConfiguration& config,  
-          std::string ns, std::string marker_snooping_action_server_name)
+          std::string ns, std::string target_snooping_action_server_name)
         : BT::SyncActionNode(name, config)
     {
         node_ = rclcpp::Node::make_shared("snoop_bt", ns);
         this->client_ptr_ = rclcpp_action::create_client<Snooping>(
           node_,
-          marker_snooping_action_server_name);
+          target_snooping_action_server_name);
 
         while(!client_ptr_->wait_for_action_server()) {
           RCLCPP_INFO(node_->get_logger(), "Action server snoop not available after waiting");
@@ -114,7 +114,7 @@ public:
     rclcpp_action::Client<Snooping>::SharedPtr client_ptr_;
 
     rclcpp_action::Client<SnoopForTarget::Snooping>::SendGoalOptions send_goal_options;
-    marker_snooping_interfaces::action::Snooping::Goal goal_msg;
+    target_snooping_interfaces::action::Snooping::Goal goal_msg;
 
     bool snooping_finished;
     bool returned_value;
