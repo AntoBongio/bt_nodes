@@ -22,7 +22,7 @@ class isGrasped: public BT::ConditionNode
           topic_right_finger,
           1,
           [&](std_msgs::msg::Int32::UniquePtr msg) {
-            if(msg->data >= 30) {
+            if(msg->data >= 100) {
               right_finger_grasped_ = true;
             }
             else {
@@ -34,7 +34,7 @@ class isGrasped: public BT::ConditionNode
           topic_left_finger,
           1,
           [&](std_msgs::msg::Int32::UniquePtr msg) {
-            if(msg->data >= 30){
+            if(msg->data >= 100){
               left_finger_grasped_ = true;
             }
             else {

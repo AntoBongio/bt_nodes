@@ -16,7 +16,7 @@
 
 using namespace std::chrono_literals;
 
-#define STATE_MAX 850 // Close
+#define STATE_MAX 0.75 // Close
 #define STATE_MIN 0 // Open
 
 class ChangeGripperState : public BT::SyncActionNode
@@ -43,11 +43,11 @@ public:
     throw BT::RuntimeError("missing required input [target_type]");
     }
     if(state_ == "open")
-        state_numeric_ = STATE_MIN;
+        state_numeric_ = 0.0;
     else if(state_ == "close")
-        state_numeric_ = STATE_MAX;
+        state_numeric_ = 0.75;
     else 
-        state_numeric_ = std::stoi(state_);
+        state_numeric_ = std::stof(state_);
 
     RCLCPP_INFO(node_->get_logger(), "ChangeGripperState - init");
 
@@ -94,7 +94,7 @@ private:
   rclcpp::Client<ChangeGripperStateService>::SharedPtr  client_ptr_;
 
   std::string state_;
-  int state_numeric_;
+  double state_numeric_;
 
   bool service_finished_;
   bool returned_value_;

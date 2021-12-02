@@ -15,12 +15,17 @@
 
 #include "xarm_test_moveit_interfaces/action/follow_target.hpp"
 
+#include "xarm_test_moveit_interfaces/action/approach_target.hpp"
+#include "xarm_test_moveit_interfaces/action/pull_back.hpp"
 
 class FollowTarget : public BT::AsyncActionNode
 {
 public:
   using FollowTargetAction = xarm_test_moveit_interfaces::action::FollowTarget;
   using GoalHandleFollowTarget = rclcpp_action::ClientGoalHandle<FollowTargetAction>;
+
+  using ApproachTarget = xarm_test_moveit_interfaces::action::ApproachTarget;
+  using PullBack = xarm_test_moveit_interfaces::action::PullBack;
 
   FollowTarget(const std::string& name, const BT::NodeConfiguration& config, std::string & ns)
     : BT::AsyncActionNode(name, config)
@@ -40,6 +45,24 @@ public:
 
     while(!client_ptr_->wait_for_action_server()) {
       RCLCPP_INFO(node_->get_logger(), "Action server follow target not available after waiting.");
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    
+    client_approach_target_ = rclcpp_action::create_client<ApproachTarget>(
+      node_,
+      "/approach_target");
+
+    while(!client_approach_target_->wait_for_action_server()) {
+      RCLCPP_INFO(node_->get_logger(), "Action server Approach Target not available after waiting");
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+    client_pull_back_ = rclcpp_action::create_client<PullBack>(
+      node_,
+      "/pull_back");
+
+    while(!client_pull_back_->wait_for_action_server()) {
+      RCLCPP_INFO(node_->get_logger(), "Action server Pull Back not available after waiting");
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
@@ -64,6 +87,29 @@ public:
 
   virtual BT::NodeStatus tick() override
   {
+    //? Deactivate all approach target actions
+    bool approach_target_end = false;
+    auto result_approach = client_approach_target_->async_cancel_all_goals(
+      [&](std::shared_ptr<action_msgs::srv::CancelGoal_Response> cancel){
+        approach_target_end = true;
+      });
+
+    while(not approach_target_end) {
+      std::this_thread::sleep_for(10ms);
+    }
+
+    //? Deactivate all pull back actions
+    bool pull_back_end = false;
+    auto result_pull_back = client_pull_back_->async_cancel_all_goals(
+      [&](std::shared_ptr<action_msgs::srv::CancelGoal_Response> cancel){
+        pull_back_end = true;
+      });
+
+    while(not pull_back_end) {
+      std::this_thread::sleep_for(10ms);
+    }
+
+    
     goal_msg = FollowTargetAction::Goal();
 
     goal_msg.target.data = target_type_;
@@ -141,6 +187,9 @@ private:
 
   rclcpp::Node::SharedPtr node_;
   rclcpp_action::Client<FollowTargetAction>::SharedPtr client_ptr_;
+  rclcpp_action::Client<ApproachTarget>::SharedPtr client_approach_target_;
+  rclcpp_action::Client<PullBack>::SharedPtr client_pull_back_;
+  
 
   rclcpp_action::Client<FollowTargetAction>::SendGoalOptions send_goal_options_;
   FollowTargetAction::Goal goal_msg;
