@@ -55,7 +55,7 @@ public:
         returned_value = false;
 
         auto request = std::make_shared<SetBool::Request>();
-        request->data = True;
+        request->data = true;
 
         using ServiceResponseFuture =
           rclcpp::Client<SetBool>::SharedFutureWithRequest;
