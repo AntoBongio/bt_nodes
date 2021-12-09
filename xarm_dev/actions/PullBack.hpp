@@ -108,7 +108,7 @@ public:
 
     goal_msg = PullBackAction::Goal();
 
-    goal_msg.pull_back = {0.2, 0.0};
+    goal_msg.pull_back = {0.08, 0.0};
 
     action_finished_ = false;
     
